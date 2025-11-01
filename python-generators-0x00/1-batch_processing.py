@@ -19,12 +19,10 @@ def stream_users_in_batches(batch_size):
         batch = []
         for row in cursor:
             batch.append(row)
-            # When batch reaches desired size, yield it and reset
             if len(batch) == batch_size:
                 yield batch
                 batch = []
 
-        # Yield remaining rows if they don’t fill the batch
         if batch:
             yield batch
 
@@ -39,8 +37,8 @@ def stream_users_in_batches(batch_size):
 
 
 def batch_processing(batch_size):
-    """Process each batch and yield users over age 25."""
+    """Generator that yields users over age 25 from each batch."""
     for batch in stream_users_in_batches(batch_size):
         for user in batch:
             if user['age'] > 25:
-                print(user)
+                yield user
