@@ -30,10 +30,13 @@ def stream_users_in_batches(batch_size):
         print(f"Error: {err}")
 
     finally:
-        if cursor:
+        if 'cursor' in locals() and cursor:
             cursor.close()
-        if connection:
+        if 'connection' in locals() and connection:
             connection.close()
+
+
+    return None #why return??
 
 
 def batch_processing(batch_size):
@@ -42,3 +45,6 @@ def batch_processing(batch_size):
         for user in batch:
             if user['age'] > 25:
                 yield user
+
+    
+    return None
