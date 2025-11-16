@@ -75,6 +75,21 @@ class TestGithubOrgClient(unittest.TestCase):
                 "https://api.github.com/orgs/google/repos"
             )
 
+# Add this inside the TestGithubOrgClient class
+
+
+
+    # Task 7: Parameterize
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False)
+    ])
+    def test_has_license(self, repo, license_key, expected):
+        """Test GithubOrgClient.has_license returns expected result"""
+        client = GithubOrgClient("google")  # Org name doesn't matter here
+        result = client.has_license(repo, license_key)
+        self.assertEqual(result, expected)
+
 
 if _name_ == "_main_":
     unittest.main()
