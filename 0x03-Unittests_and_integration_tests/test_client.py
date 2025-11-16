@@ -149,7 +149,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
             """
             # Mock response class
             class MockResponse:
-                def __init__(self, json_data):
+                def _init_(self, json_data):
                     self.json_data = json_data
 
                 def json(self):
@@ -173,5 +173,5 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         cls.get_patcher.stop()
 
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     unittest.main()
