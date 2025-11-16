@@ -29,6 +29,4 @@ class TestAccessNestedMap(unittest.TestCase):
             with self.assertRaises(KeyError) as error:
                 access_nested_map(nested_map, path)
 
-            # Python prints KeyError('a') → message is "'a'"
-            expected_message = repr(path[-1])
-            self.assertEqual(str(error.exception), expected_message)
+            self.assertEqual(error.exception.args[0], path[-1])
