@@ -6,7 +6,7 @@ import utils  # make sure utils.py exists
 class GithubOrgClient:
     ORG_URL = "https://api.github.com/orgs/{org}"
 
-    def _init_(self, org: str) -> None:
+    def __init__(self, org: str) -> None:
         self.org_name = org
 
     @property
