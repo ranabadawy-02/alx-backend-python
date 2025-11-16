@@ -14,14 +14,14 @@ class TestGithubOrgClient(unittest.TestCase):
         ("google",),
         ("abc",)
     ])
-    @patch("client.get_json")
+    @patch("utils.get_json")  # <-- patch the exact import used in client.py
     def test_org(self, org_name, mock_get_json):
         """Test that org returns the correct payload"""
         mock_payload = {"login": org_name}
         mock_get_json.return_value = mock_payload
 
         client = GithubOrgClient(org_name)
-        result = client.org  # access property, not method
+        result = client.org  # access property
 
         mock_get_json.assert_called_once_with(
             f"https://api.github.com/orgs/{org_name}"
