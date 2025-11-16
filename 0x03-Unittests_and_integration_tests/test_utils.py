@@ -65,7 +65,9 @@ class TestMemoize(unittest.TestCase):
 
         test_instance = TestClass()
 
-        with patch.object(test_instance, 'a_method', return_value=42) as mocked:
+        with patch.object(
+            test_instance, 'a_method', return_value=42
+        ) as mocked:
             result1 = test_instance.a_property
             result2 = test_instance.a_property
 
@@ -76,4 +78,3 @@ class TestMemoize(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
