@@ -8,7 +8,7 @@ from client import GithubOrgClient
 
 
 class TestGithubOrgClient(unittest.TestCase):
-    """Tests for GithubOrgClient"""
+    """Unit tests for GithubOrgClient"""
 
     # Task 4: Parameterize and patch as decorators
     @patch("client.get_json")
@@ -18,7 +18,6 @@ class TestGithubOrgClient(unittest.TestCase):
     ])
     def test_org(self, org_name, mock_get_json):
         """Test that GithubOrgClient.org returns the expected value"""
-
         mock_get_json.return_value = {"login": org_name}
 
         client = GithubOrgClient(org_name)
@@ -32,7 +31,6 @@ class TestGithubOrgClient(unittest.TestCase):
     # Task 5: Mocking a property
     def test_public_repos_url(self):
         """Test GithubOrgClient._public_repos_url property"""
-
         fake_org_payload = {
             "repos_url": "https://api.github.com/orgs/google/repos"
         }
@@ -45,15 +43,13 @@ class TestGithubOrgClient(unittest.TestCase):
             client = GithubOrgClient("google")
             result = client._public_repos_url
 
-            self.assertEqual(
-                result, fake_org_payload["repos_url"]
-            )
+            self.assertEqual(result, fake_org_payload["repos_url"])
 
     # Task 6: More patching
     @patch("client.get_json")
     def test_public_repos(self, mock_get_json):
         """Test GithubOrgClient.public_repos method"""
-
+        # Mocked API response from get_json
         mock_get_json.return_value = [
             {"name": "repo1"},
             {"name": "repo2"},
@@ -62,6 +58,7 @@ class TestGithubOrgClient(unittest.TestCase):
 
         client = GithubOrgClient("google")
 
+        # Patch the _public_repos_url property to a fake URL
         with patch.object(
             GithubOrgClient, "_public_repos_url", new_callable=PropertyMock
         ) as mock_url:
@@ -69,12 +66,15 @@ class TestGithubOrgClient(unittest.TestCase):
 
             result = client.public_repos()
 
+            # Assert the result is the list of repo names
             self.assertEqual(result, ["repo1", "repo2", "repo3"])
+
+            # Assert the mocks were called exactly once
             mock_url.assert_called_once()
             mock_get_json.assert_called_once_with(
                 "https://api.github.com/orgs/google/repos"
             )
 
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     unittest.main()
