@@ -49,22 +49,22 @@ class TestGithubOrgClient(unittest.TestCase):
     # Task 6: More patching
     @patch("client.get_json")
     def test_public_repos(self, mock_get_json):
-    """Test GithubOrgClient.public_repos method"""
-    mock_get_json.return_value = [
-        {"name": "repo1"},
-        {"name": "repo2"},
-        {"name": "repo3"}
-    ]
-    client = GithubOrgClient("google")
-    with patch.object(
-        GithubOrgClient, "_public_repos_url", new_callable=PropertyMock
-    ) as mock_url:
-        mock_url.return_value = "https://api.github.com/orgs/google/repos"
-        result = client.public_repos()  # call without license_key
-        self.assertEqual(result, ["repo1", "repo2", "repo3"])
-        mock_get_json.assert_called_once_with(
-            "https://api.github.com/orgs/google/repos"
-        )
+        """Test GithubOrgClient.public_repos method"""
+        mock_get_json.return_value = [
+            {"name": "repo1"},
+            {"name": "repo2"},
+            {"name": "repo3"}
+        ]
+        client = GithubOrgClient("google")
+        with patch.object(
+            GithubOrgClient, "_public_repos_url", new_callable=PropertyMock
+        ) as mock_url:
+            mock_url.return_value = "https://api.github.com/orgs/google/repos"
+            result = client.public_repos()  # call without license_key
+            self.assertEqual(result, ["repo1", "repo2", "repo3"])
+            mock_get_json.assert_called_once_with(
+                "https://api.github.com/orgs/google/repos"
+            )
 
     # Task 7: Parameterize has_license
     @parameterized.expand([
