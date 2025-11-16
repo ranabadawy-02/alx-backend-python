@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unit tests for client.GithubOrgClient"""
+"""Unit tests for GithubOrgClient"""
 
 import unittest
 from parameterized import parameterized
@@ -8,30 +8,27 @@ from client import GithubOrgClient
 
 
 class TestGithubOrgClient(unittest.TestCase):
-    """Test GithubOrgClient.org property"""
+    """Test GithubOrgClient.org"""
 
     @parameterized.expand([
         ("google",),
         ("abc",)
     ])
-    @patch("utils.get_json")  # patch the import used inside client.py
+    @patch("client.get_json")
     def test_org(self, org_name, mock_get_json):
-        """Test that org returns the correct payload"""
-        # Mock return value
-        mock_payload = {"login": org_name}
-        mock_get_json.return_value = mock_payload
+        """Test that org property returns the correct payload"""
+        payload = {"login": org_name}
+        mock_get_json.return_value = payload
 
-        # Instantiate client and access property
         client = GithubOrgClient(org_name)
-        result = client.org  # access as property
+        result = client.org  # property access
 
-        # Ensure get_json called once with correct URL
+        # Check get_json called with correct URL
         mock_get_json.assert_called_once_with(
             f"https://api.github.com/orgs/{org_name}"
         )
-
-        # Ensure result matches mock payload
-        self.assertEqual(result, mock_payload)
+        # Check return value
+        self.assertEqual(result, payload)
 
 
 if __name__ == "__main__":
