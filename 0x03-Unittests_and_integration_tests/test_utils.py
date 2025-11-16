@@ -7,7 +7,6 @@ from unittest.mock import patch, Mock
 from utils import access_nested_map, get_json, memoize
 
 
-
 class TestAccessNestedMap(unittest.TestCase):
     """Test cases for access_nested_map"""
 
@@ -75,8 +74,6 @@ class TestMemoize(unittest.TestCase):
             self.assertEqual(result1, 42)
             self.assertEqual(result2, 42)
             mocked.assert_called_once()
-
-
 
 
 if __name__ == "__main__":
