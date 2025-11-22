@@ -4,6 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer, UserSerializer
 from .permissions import IsParticipantOfConversation
+from .filters import MessageFilter
+from .pagination import MessagePagination
+
 
 
 # -----------------------------
@@ -43,9 +46,12 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, IsParticipantOfConversation]  # ✅ Add IsAuthenticated
-    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['message_body', 'sender__first_name', 'sender__last_name']
-    ordering_fields = ['sent_at']
+    ordering_fields = ['sent_at'] 
+    pagination_class = MessagePagination
+    filterset_class = MessageFilter   # ✅ Add filtering
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter, django_filters.rest_framework.DjangoFilterBackend]
+   
 
     def get_queryset(self):
         return Message.objects.filter(conversation__participants=self.request.user)
