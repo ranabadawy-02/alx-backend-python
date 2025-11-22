@@ -1,15 +1,17 @@
-from rest_framework.permissions import BasePermission
+from rest_framework import permissions
 
-class IsOwnerOfChat(BasePermission):
+class IsOwnerOfChat(permissions.BasePermission):
     """
-    Object-level permission: users can access only chats
-    where they are a participant.
+    Allow access only to users who own the chat or the message.
     """
 
     def has_object_permission(self, request, view, obj):
-        # obj = Chat or Message instance
+        # If obj is a Chat → user must be in participants
         if hasattr(obj, "participants"):
             return request.user in obj.participants.all()
+
+        # If obj is a Message → user must be the sender or a participant in the chat
         if hasattr(obj, "sender"):
-            return obj.sender == request.user
+            return obj.sender == request.user or request.user in obj.chat.participants.all()
+
         return False
