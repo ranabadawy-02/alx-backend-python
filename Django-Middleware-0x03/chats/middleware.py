@@ -51,3 +51,53 @@ class RestrictAccessByTimeMiddleware:
             return HttpResponseForbidden("Access to chat is restricted at this time.")
 
         return self.get_response(request)
+
+from django.http import HttpResponseForbidden
+from datetime import datetime, timedelta
+
+class OffensiveLanguageMiddleware:
+    """
+    Middleware that limits the number of chat messages a user can send
+    per IP address within a time window (e.g., 5 messages per minute).
+    """
+
+    # Class-level dictionary to track IP addresses and timestamps
+    ip_message_tracker = {}
+
+    MAX_MESSAGES = 5
+    TIME_WINDOW = timedelta(minutes=1)
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Only track POST requests (sending messages)
+        if request.method == "POST" and request.path.startswith("/chats/messages/"):
+            ip = self.get_client_ip(request)
+            now = datetime.now()
+
+            # Initialize tracker for this IP
+            if ip not in self.ip_message_tracker:
+                self.ip_message_tracker[ip] = []
+
+            # Remove timestamps older than TIME_WINDOW
+            self.ip_message_tracker[ip] = [
+                t for t in self.ip_message_tracker[ip] if now - t < self.TIME_WINDOW
+            ]
+
+            if len(self.ip_message_tracker[ip]) >= self.MAX_MESSAGES:
+                return HttpResponseForbidden("Message limit exceeded. Try again later.")
+
+            # Record current message timestamp
+            self.ip_message_tracker[ip].append(now)
+
+        return self.get_response(request)
+
+    def get_client_ip(self, request):
+        # Get IP address from request headers
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
