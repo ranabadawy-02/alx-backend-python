@@ -3,7 +3,7 @@ import logging
 
 from django.http import HttpResponseForbidden
 
-class RolePermissionMiddleware:
+class RolepermissionMiddleware:
     """
     Middleware that allows only users with role 'admin' or 'moderator'
     to access specific chat actions.
