@@ -12,6 +12,8 @@ def inbox(request):
         "messages": unread_messages
     })
 
+.only("id", "sender", "receiver", "content", "timestamp")
+
 @login_required
 def delete_user(request):
     """
