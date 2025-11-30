@@ -7,10 +7,17 @@ class Message(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_messages")
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-    edited = models.BooleanField(default=False)  # NEW FIELD
+    edited = models.BooleanField(default=False)
+    parent_message = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        related_name='replies',
+        null=True,
+        blank=True
+    )  # NEW FIELD FOR THREADING
 
     def __str__(self):
-        return f"From {self.sender} to {self.receiver}: {self.content[:20]}"
+        return f"Msg {self.id} from {self.sender}"
 
 
 class Notification(models.Model):
@@ -35,3 +42,27 @@ class MessageHistory(models.Model):
 
     def __str__(self):
         return f"History for Message {self.message.id} (edited by {self.edited_by})"
+
+from django.db.models import Prefetch
+
+
+class MessageQuerySet(models.QuerySet):
+    def with_sender_receiver(self):
+        return self.select_related("sender", "receiver")
+
+    def with_replies(self):
+        return self.prefetch_related(
+            Prefetch("replies", queryset=Message.objects.all().select_related("sender", "receiver"))
+        )
+
+from django.db.models import Prefetch
+
+
+class MessageQuerySet(models.QuerySet):
+    def with_sender_receiver(self):
+        return self.select_related("sender", "receiver")
+
+    def with_replies(self):
+        return self.prefetch_related(
+            Prefetch("replies", queryset=Message.objects.all().select_related("sender", "receiver"))
+        )
