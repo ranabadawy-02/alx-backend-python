@@ -8,15 +8,19 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     edited = models.BooleanField(default=False)
+    read = models.BooleanField(default=False)  # NEW FIELD
     parent_message = models.ForeignKey(
         'self',
         on_delete=models.CASCADE,
         related_name='replies',
         null=True,
         blank=True
-    )  # NEW FIELD FOR THREADING
+    )
 
-    def __str__(self):
+    objects = MessageManager()  # your default manager (from Task 3)
+    unread = UnreadMessagesManager()  # NEW MANAGER
+
+    def _str_(self):
         return f"Msg {self.id} from {self.sender}"
 
 
@@ -65,4 +69,16 @@ class MessageQuerySet(models.QuerySet):
     def with_replies(self):
         return self.prefetch_related(
             Prefetch("replies", queryset=Message.objects.all().select_related("sender", "receiver"))
+        )
+
+class UnreadMessagesManager(models.Manager):
+    def for_user(self, user):
+        """
+        Returns unread messages for a specific user,
+        optimized with .only() to load minimal fields.
+        """
+        return (
+            super().get_queryset()
+            .filter(receiver=user, read=False)
+            .only("id", "sender", "receiver", "content", "timestamp")
         )
