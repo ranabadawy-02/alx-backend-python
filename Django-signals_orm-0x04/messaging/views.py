@@ -13,3 +13,28 @@ def delete_user(request):
     logout(request)  # log them out before deletion
     user.delete()
     return redirect("/")  # redirect to homepage after deletion
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import Message
+
+
+@login_required
+def user_conversations(request):
+    """
+    Fetch all conversations for the logged-in user,
+    optimized using select_related and prefetch_related.
+    """
+
+    messages = (
+        Message.objects
+        .filter(sender=request.user) | Message.objects.filter(receiver=request.user)
+    )
+
+    # Apply ORM optimizations
+    messages = messages.select_related("sender", "receiver").prefetch_related("replies")
+
+    context = {
+        "messages": messages
+    }
+    return render(request, "messaging/conversations.html", context)
