@@ -2,12 +2,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
+from django.shortcuts import render
 from .models import Message
 
-def unread_inbox(request):
-    unread_messages = Message.unread.for_user(request.user)
-    return render(request, "messaging/unread_inbox.html", {"messages": unread_messages})
+def inbox(request):
+    unread_messages = Message.unread.unread_for_user(request.user)
 
+    return render(request, "inbox.html", {
+        "messages": unread_messages
+    })
 
 @login_required
 def delete_user(request):
