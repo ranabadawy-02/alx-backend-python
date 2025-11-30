@@ -82,3 +82,15 @@ class UnreadMessagesManager(models.Manager):
             .filter(receiver=user, read=False)
             .only("id", "sender", "receiver", "content", "timestamp")
         )
+
+class UnreadMessagesManager(models.Manager):
+    def for_user(self, user):
+        """
+        Returns unread messages for a specific user,
+        optimized with .only() to load minimal fields.
+        """
+        return (
+            super().get_queryset()
+            .filter(receiver=user, read=False)
+            .only("id", "sender", "receiver", "content", "timestamp")
+        )
