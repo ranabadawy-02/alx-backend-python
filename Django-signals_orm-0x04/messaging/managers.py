@@ -25,15 +25,9 @@ class MessageManager(models.Manager):
         return self.get_queryset().with_sender_receiver().with_replies()
 
 
-class UnreadMessagesManager(models.Manager):
-    """
-    Manager that exposes a for_user(user) method returning unread messages
-    for a specific receiver, optimized with .only().
-    """
-    def get_queryset(self):
-        return super().get_queryset()
 
-    def for_user(self, user):
+class UnreadMessagesManager(models.Manager):
+    def unread_for_user(self, user):
         return (
             self.get_queryset()
             .filter(receiver=user, read=False)
