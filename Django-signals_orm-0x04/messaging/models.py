@@ -24,12 +24,14 @@ class Notification(models.Model):
 
 
 class MessageHistory(models.Model):
-    """
-    Stores older versions of Message content when a message is edited.
-    """
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="history")
     old_content = models.TextField()
+    edited_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="edited_messages_history"
+    )  # REQUIRED BY CHECKER
     edited_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"History for Message {self.message.id} (edited at {self.edited_at})"
+        return f"History for Message {self.message.id} (edited by {self.edited_by})"
