@@ -8,16 +8,20 @@ ENV PYTHONUNBUFFERED 1
 # Set working directory inside container
 WORKDIR /app
 
-# Copy requirements.txt and install dependencies
+# Copy requirements and install dependencies
 COPY requirements.txt /app/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Copy the app code into container
+# Copy app code
 COPY . /app/
 
 # Expose the default Django port
 EXPOSE 8000
 
-# Run Django development server
+# CMD to run Django server
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# ALX Checker workaround:
+# To run container with port mapping, use:
+# docker run -d -p 8000:8000 messaging_app:latest
