@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# -------------------------------------------------------------
+#  kubctl-0x03 - Rolling Update for Blue Deployment (version 2.0)
+# -------------------------------------------------------------
+
+DEPLOY_FILE="blue_deployment.yaml"
+DEPLOY_NAME="messaging-app-blue"
+SERVICE_NAME="messaging-app-service"
+
+echo "🚀 Applying updated deployment (Rolling Update)..."
+kubectl apply -f $DEPLOY_FILE
+
+echo "⏳ Monitoring rollout status..."
+kubectl rollout status deployment/$DEPLOY_NAME
+
+echo "🔍 Getting current pods..."
+kubectl get pods -l version=blue -o wide
+
+echo "🌐 Fetching service ClusterIP..."
+CLUSTER_IP=$(kubectl get svc $SERVICE_NAME -o jsonpath='{.spec.clusterIP}')
+PORT=$(kubectl get svc $SERVICE_NAME -o jsonpath='{.spec.ports[0].port}')
+
+echo "🔁 Starting continuous curl test to check downtime..."
+echo "Testing: http://$CLUSTER_IP:$PORT/"
+
+# Send 30 continuous requests
+for i in {1..30}
+do
+  echo -n "Request $i -> "
+  curl -s -o /dev/null -w "%{http_code}\n" http://$CLUSTER_IP:$PORT/
+  sleep 1
+done
+
+echo "✔️ Curl test finished."
+
+echo "📌 Final Pods after rolling update:"
+kubectl get pods -l version=blue -o wide
+
+echo "🎉 Rolling Update Completed Successfully!"
