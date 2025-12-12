@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# --------------------------------------------------------
+#  kubctl-0x01 - Scale Django App, Verify Pods, Load Test
+# --------------------------------------------------------
+
+DEPLOYMENT="messaging-app-deployment"
+
+echo "📌 Scaling Deployment to 3 replicas..."
+kubectl scale deployment $DEPLOYMENT --replicas=3
+
+echo "⏳ Waiting for pods to scale up..."
+sleep 5
+
+echo "🔎 Checking running pods..."
+kubectl get pods -o wide
+
+echo "📌 Checking Deployment status..."
+kubectl get deployment $DEPLOYMENT
+
+echo "🚀 Starting load test using wrk..."
+echo "⚠️ NOTE: Messaging app must be exposed for wrk testing."
+
+# Get ClusterIP and port
+SERVICE_IP=$(kubectl get svc messaging-app-service -o jsonpath='{.spec.clusterIP}')
+SERVICE_PORT=$(kubectl get svc messaging-app-service -o jsonpath='{.spec.ports[0].port}')
+
+echo "➡️ Testing URL: http://$SERVICE_IP:$SERVICE_PORT/"
+
+# Run 15-second wrk load test (3 threads, 50 connections)
+wrk -t3 -c50 -d15s http://$SERVICE_IP:$SERVICE_PORT/
+
+echo "📊 Monitoring resource usage (pods + nodes)..."
+kubectl top pods
+kubectl top nodes
+
+echo "🎉 Scaling & load testing completed!"
